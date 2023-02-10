@@ -14,8 +14,13 @@
 # limitations under the License.
 # Lint as: python3
 """Baseline preprocessing utilities."""
+from configparser import InterpolationMissingOptionError
 import copy
-
+from email import header
+import random
+from pyparsing import col
+from stemming.porter2 import stem 
+from scipy import rand
 
 def _add_adjusted_col_offsets(table):
   """Add adjusted column offsets to take into account multi-column cells."""
@@ -61,29 +66,281 @@ def _get_heuristic_col_headers(adjusted_table, row_index, col_index):
   return col_headers
 
 
-def get_highlighted_subtable(table, cell_indices, with_heuristic_headers=False):
+def get_highlighted_subtable1(table, cell_indices, with_heuristic_headers=False,reference_tokens=[]):
   """Extract out the highlighted part of a table."""
   highlighted_table = []
 
   adjusted_table = _add_adjusted_col_offsets(table)
+  # print(len(adjusted_table))
+  # print(len(adjusted_table[0]))
+  
+   ########################################################################## add noise
+  row =  len(table)
+  col = 999
+  for e in table:
+     if len(e)<col:
+       col = len(e)
+  noise = [random.randint(0,row),random.randint(0,col)]
+   # print(row,'   ',col)
+   # print('-----------------------------')
+   # print(cell_indices)
+  while noise in cell_indices:
+    noise = [random.randint(0,row),random.randint(0,col)]
+  cell_indices.append(noise)
 
   for (row_index, col_index) in cell_indices:
-    cell = table[row_index][col_index]
-    if with_heuristic_headers:
-      row_headers = _get_heuristic_row_headers(adjusted_table, row_index,
-                                               col_index)
-      col_headers = _get_heuristic_col_headers(adjusted_table, row_index,
-                                               col_index)
-    else:
-      row_headers = []
-      col_headers = []
+    try:
+      cell = table[row_index][col_index]
+      
+      # break
+      if with_heuristic_headers:
+        row_headers = _get_heuristic_row_headers(adjusted_table, row_index,
+                                                col_index)
+        col_headers = _get_heuristic_col_headers(adjusted_table, row_index,
+                                                col_index)
+      else:
+        row_headers = []
+        col_headers = []
 
-    highlighted_cell = {
-        "cell": cell,
-        "row_headers": row_headers,
-        "col_headers": col_headers
-    }
-    highlighted_table.append(highlighted_cell)
+      highlighted_cell = {
+          "cell": cell,
+          "row_headers": row_headers,
+          "col_headers": col_headers
+      }
+      # print(highlighted_cell)
+      highlighted_table.append(highlighted_cell)
+    except:
+      pass
+
+  return highlighted_table
+
+
+def get_highlighted_subtable(table, cell_indices, with_heuristic_headers=False,reference_tokens=[]):
+  """Extract out the highlighted part of a table."""
+  highlighted_table = []
+
+  adjusted_table = _add_adjusted_col_offsets(table)
+  # print(len(adjusted_table))
+  # print(len(adjusted_table[0]))
+  
+  for (row_index, col_index) in cell_indices:
+    try:
+      cell = table[row_index][col_index]
+      
+      # break
+      if with_heuristic_headers:
+        row_headers = _get_heuristic_row_headers(adjusted_table, row_index,
+                                                col_index)
+        col_headers = _get_heuristic_col_headers(adjusted_table, row_index,
+                                                col_index)
+      else:
+        row_headers = []
+        col_headers = []
+
+      highlighted_cell = {
+          "cell": cell,
+          "row_headers": row_headers,
+          "col_headers": col_headers
+      }
+      # print(highlighted_cell)
+      highlighted_table.append(highlighted_cell)
+    except:
+      pass
+
+  return highlighted_table
+
+def get_highlighted_subtable2(table, cell_indices, with_heuristic_headers=False,reference_tokens=[]):
+  """Extract out the highlighted part of a table."""
+  highlighted_table = []
+
+  adjusted_table = _add_adjusted_col_offsets(table)
+  # print(len(adjusted_table))
+  # print(len(adjusted_table[0]))
+
+  ################################################################################# header noise
+  highlighted_num = len(cell_indices)
+  header_noise = [0,cell_indices[random.randint(0,highlighted_num-1)][1]]
+  cell_indices.append(header_noise)
+
+  for (row_index, col_index) in cell_indices:
+    try:
+      cell = table[row_index][col_index]
+      
+      # break
+      if with_heuristic_headers:
+        row_headers = _get_heuristic_row_headers(adjusted_table, row_index,
+                                                col_index)
+        col_headers = _get_heuristic_col_headers(adjusted_table, row_index,
+                                                col_index)
+      else:
+        row_headers = []
+        col_headers = []
+
+      highlighted_cell = {
+          "cell": cell,
+          "row_headers": row_headers,
+          "col_headers": col_headers
+      }
+      # print(highlighted_cell)
+      highlighted_table.append(highlighted_cell)
+    except:
+      pass
+
+  return highlighted_table
+
+
+def get_highlighted_subtable3(table, cell_indices, with_heuristic_headers=False,reference_tokens=[]):
+  """Extract out the highlighted part of a table."""
+  highlighted_table = []
+
+  adjusted_table = _add_adjusted_col_offsets(table)
+  # print(len(adjusted_table))
+  # print(len(adjusted_table[0]))
+
+  highlighted__num = len(cell_indices)
+  if highlighted__num>=3: 
+    cell_indices.pop(random.randint(0,highlighted__num-1))
+
+
+
+
+
+  for (row_index, col_index) in cell_indices:
+    try:
+      cell = table[row_index][col_index]
+      
+      # break
+      if with_heuristic_headers:
+        row_headers = _get_heuristic_row_headers(adjusted_table, row_index,
+                                                col_index)
+        col_headers = _get_heuristic_col_headers(adjusted_table, row_index,
+                                                col_index)
+      else:
+        row_headers = []
+        col_headers = []
+
+      highlighted_cell = {
+          "cell": cell,
+          "row_headers": row_headers,
+          "col_headers": col_headers
+      }
+      # print(highlighted_cell)
+      highlighted_table.append(highlighted_cell)
+    except:
+      pass
+
+  return highlighted_table
+
+
+def get_highlighted_subtable4(table, cell_indices, with_heuristic_headers=False,reference_tokens=[]):
+  """Extract out the highlighted part of a table."""
+  highlighted_table = []
+
+  adjusted_table = _add_adjusted_col_offsets(table)
+  # print(len(adjusted_table))
+  # print(len(adjusted_table[0]))
+  
+# ########################################################################## add noise
+#   row =  len(table)
+#   col = 999
+#   for e in table:
+#     if len(e)<col:
+#       col = len(e)
+#   noise = [random.randint(0,row),random.randint(0,col)]
+#   # print(row,'   ',col)
+#   # print('-----------------------------')
+#   # print(cell_indices)
+#   while noise in cell_indices:
+#     noise = [random.randint(0,row),random.randint(0,col)]
+#   cell_indices.append(noise)
+#   # print(cell_indices)
+#   # print()
+# ###############################################################################
+
+# ############################################################################### mask
+#   highlighted__num = len(cell_indices)
+#   if highlighted__num>=3: 
+#     cell_indices.pop(random.randint(0,highlighted__num-1))
+
+# ###############################################################################
+
+# ################################################################################# header noise
+#   highlighted_num = len(cell_indices)
+#   header_noise = [0,cell_indices[random.randint(0,highlighted_num-1)][1]]
+#   cell_indices.append(header_noise)
+# #################################################################################
+
+# ################################################################################# row col noise
+#   row =  len(table)
+#   col = 999
+#   for e in table:
+#     if len(e)<col:
+#       col = len(e)
+#   highlighted_num = len(cell_indices)
+#   rand_highlighted_cell = cell_indices[random.randint(0,highlighted_num-1)]
+#   # print(rand_highlighted_cell)
+#   row_flag = random.randint(0,1)
+#   if row_flag:
+#     noise = [random.randint(0,row),rand_highlighted_cell[1]]
+#     # while noise in cell_indices:
+#     #   noise = [random.randint(0,row),rand_highlighted_cell[1]]
+#   else:
+#     noise = [rand_highlighted_cell[0],random.randint(0,col)]
+#     # while noise in cell_indices:
+#     #   noise =[rand_highlighted_cell[0],random.randint(0,col)]
+#   # print(noise)
+#   # print('----------------------')
+#   # print(row,'   ',col)
+#   # print('-----------------------------')
+#   # print(cell_indices) 
+#   cell_indices.append(noise)
+#   # print(cell_indices)
+#   # print('--------------------')
+# #################################################################################
+
+
+  ################################################################################### reference token mask
+  # print(cell_indices)
+  if reference_tokens!=[]:
+    for (row_index, col_index) in cell_indices:
+      # print((row_index, col_index))
+      cell_text = table[row_index][col_index]['value']
+      cell_text_tokens = stem(cell_text.lower()).split(' ')
+      text_len = len(cell_text_tokens)
+      count = 0
+      for e in cell_text_tokens:
+        for _ in reference_tokens:
+          if e.find(_)>=0 or _.find(e)>=0:
+            count+=1
+      if count==0:
+        cell_indices.remove([row_index,col_index])
+  # print(cell_indices)
+  # print('----------------------------------')
+  ##################################################################################
+
+  for (row_index, col_index) in cell_indices:
+    try:
+      cell = table[row_index][col_index]
+      
+      # break
+      if with_heuristic_headers:
+        row_headers = _get_heuristic_row_headers(adjusted_table, row_index,
+                                                col_index)
+        col_headers = _get_heuristic_col_headers(adjusted_table, row_index,
+                                                col_index)
+      else:
+        row_headers = []
+        col_headers = []
+
+      highlighted_cell = {
+          "cell": cell,
+          "row_headers": row_headers,
+          "col_headers": col_headers
+      }
+      # print(highlighted_cell)
+      highlighted_table.append(highlighted_cell)
+    except:
+      pass
 
   return highlighted_table
 
@@ -116,6 +373,7 @@ def linearize_full_table(table, cell_indices, table_page_title,
 
       # The value of the cell.
       item_str = start_cell_marker + col["value"] + " "
+      # print(item_str)
 
       # All the column headers associated with this cell.
       for col_header in col_headers:
@@ -130,10 +388,13 @@ def linearize_full_table(table, cell_indices, table_page_title,
 
     row_str += "</row> "
     table_str += row_str
+    # print(table_str)
+    # break
 
   table_str += "</table>"
   if cell_indices:
     assert "<highlighted_cell>" in table_str
+  # print(table_str)
   return table_str
 
 

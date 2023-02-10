@@ -159,6 +159,7 @@ class Data:
         return batch_input, batch_labels 
 
     def get_next_train_batch(self, batch_size):
+        #print(self.train_idx_list)
         batch_idx_list = random.sample(self.train_idx_list, batch_size)
         batch_content_set = set()
         for one_idx in batch_idx_list:

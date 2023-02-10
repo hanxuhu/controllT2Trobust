@@ -17,7 +17,7 @@ import subprocess
 from subprocess import call
 import argparse
 from dataclass import Data
-
+import pickle
 def parse_config():
     parser = argparse.ArgumentParser()
     # data configuration
@@ -43,7 +43,7 @@ def parse_config():
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--learning_rate', type=float, default=2e-5)
     parser.add_argument('--print_every', type=int, default=200)
-    parser.add_argument('--eval_every', type=int, default=2000)
+    parser.add_argument('--eval_every', type=int, default=4000)
     parser.add_argument('--gradient_accumulation_steps', type=int, default=2)
     parser.add_argument('--dropout', type=float, default=0.2)
     parser.add_argument('--ckpt_path', type=str, default=r'./ckpt/pretrain/')
@@ -89,9 +89,15 @@ if __name__ == '__main__':
     dev_dict['processed_file_path'] = None
     use_RL = False
 
+    #with open('mixdata.pickle','rb') as f:
+    #   data = pickle.load(f)
+
     data = Data(train_dict, dev_dict, args.max_table_len, args.max_content_plan_len, args.max_tgt_len, 
         args.model_name, special_token_name, args.min_slot_key_cnt, use_RL)
     print ('Data loaded.')
+    with open('mixdata1.pickle', 'wb') as f:
+        pickle.dump(data, f)
+        f.close()
 
     from generator import Generator
     model = Generator(model_name=args.model_name, tokenizer=data.decode_tokenizer, 

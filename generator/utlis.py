@@ -16,13 +16,19 @@ def eval_totto(prediction_path, target_path):
     #print(res)
     #res=res[0]
     #print(res)
-    content_list = res.split(r'BLEU')
+    content_list = res.split(r'BLEU+case.mixed+numrefs.3+smooth.exp+tok.13a+version.1.4.10 = ')
+    overall_bleu = float(content_list[1].split()[0])
+    overlap_bleu = float(content_list[2].split()[0])
+    nonoverlap_bleu = float(content_list[3].split()[0])
     #content_list = content_list.split(r'BLEU')
     #content_list[2].split(': ')[1].split(',')[0]
-    #print(content_list)
+    '''
+    print(content_list)
+
 
     overall_bleu = float(content_list[2].split(': ')[1].split(',')[0])
     overlap_bleu = float(content_list[4].split(': ')[1].split(',')[0])
     nonoverlap_bleu = float(content_list[6].split(': ')[1].split(',')[0])
+    '''
     return overall_bleu, overlap_bleu, nonoverlap_bleu
 
